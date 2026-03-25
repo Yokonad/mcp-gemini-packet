@@ -1,6 +1,6 @@
 <div align="center">
 
-# 💻 <span style="color:#00F0FF">MCP PACKET TRACER</span> 💻
+# <span style="color:#00F0FF">MCP PACKET TRACER</span>
 
 **Servidor MCP para controlar Cisco Packet Tracer con Gemini CLI usando tools en lenguaje natural.**
 
@@ -8,9 +8,8 @@
 [![Cisco](https://img.shields.io/badge/Cisco-Packet%20Tracer-1BA0D7?style=flat-square&logo=cisco&logoColor=white)](https://www.netacad.com/courses/packet-tracer)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-blueviolet?style=flat-square)](https://modelcontextprotocol.io/)
 
-<!-- GIF ANIMADO DE KONATA AQUI (Enlace directo cargado via camo de github) -->
 <a href="https://tenor.com/view/konata-lucky-star-thinking-loading-anime-gif-15680289644544200178">
-  <img src="https://media.tenor.com/cQGf5V3R72kAAAAd/konata-lucky-star.gif" width="300" alt="Konata Lucky Star GIF Loading" />
+  <img src="https://media1.tenor.com/m/2ZuUWp5LDfIAAAAC/konata-lucky-star.gif" width="300" alt="Konata Lucky Star GIF Loading" />
 </a>
 <br>
 
@@ -18,21 +17,21 @@
 
 ---
 
-## 🌸 <span style="color:#FF007F">Requisitos</span>
+## <span style="color:#FF007F">Requisitos</span>
 
 - Windows
 - Node.js 18+
 - Cisco Packet Tracer instalado
 - Gemini CLI instalado
 
-## ⚙️ <span style="color:#FF007F">Instalación</span>
+## <span style="color:#FF007F">Instalación</span>
 
 ```powershell
 npm install
 npm run build
 ```
 
-## 🚀 <span style="color:#FF007F">Inicio Rápido</span>
+## <span style="color:#FF007F">Inicio Rápido</span>
 
 ```powershell
 .\run-mcp-packet-tracer.cmd
@@ -44,7 +43,7 @@ El launcher:
 3. Arranca MCP server automaticamente.
 4. Abre Gemini CLI.
 
-## 🛠️ <span style="color:#FF007F">Tools Principales</span>
+## <span style="color:#FF007F">Tools Principales</span>
 
 | Tool | Descripcion |
 |------|-------------|
@@ -59,14 +58,14 @@ El launcher:
 | `pt_send_raw` | Envia codigo JS raw al bridge |
 | `pt_export_bridge_extension` | Exporta extension del bridge |
 
-## 📊 <span style="color:#FF007F">Diagnóstico</span>
+## <span style="color:#FF007F">Diagnóstico</span>
 
 | Endpoint | URL |
 |----------|-----|
 | Monitor visual | `http://127.0.0.1:54321/monitor` |
 | Estado JSON | `http://127.0.0.1:54321/status` |
 
-## 📝 <span style="color:#FF007F">Notas</span>
+## <span style="color:#FF007F">Notas</span>
 
 - Manten abierto Builder Code Editor (puede estar minimizado).
 - Si algo no ejecuta, corre `pt_bridge_autoconnect` y luego `pt_bridge_status`.
