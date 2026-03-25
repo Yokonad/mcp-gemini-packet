@@ -729,7 +729,7 @@ try {
     Write-Host ""
     Write-Host "============================================" -ForegroundColor DarkMagenta
     Write-Host "  Abre en Packet Tracer:" -ForegroundColor Magenta
-    Write-Host "  Extensions > Builder Code Editor" -ForegroundColor DarkMagenta
+    Write-Host "  Extensions > Scripting > Edit File Script Module > BridgeBuilder" -ForegroundColor DarkMagenta
     Write-Host "  (dejalo abierto para las topologias)" -ForegroundColor Magenta
     Write-Host "============================================" -ForegroundColor DarkMagenta
     Write-Host ""

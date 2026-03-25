@@ -25,14 +25,14 @@ const install = [
   "",
   "1) NO reemplaces devices.js, links.js, main.js, modules.js, runcode.js, userfunctions.js, window.js.",
   "2) Inicia MCP server (cmd del proyecto o node dist/index.js).",
-  "3) Abre Builder Code Editor desde Extensions.",
+  "3) Abre BridgeBuilder desde Extensions > Scripting > Edit File Script Module.",
   "4) Inyecta el bridge con alguna opcion:",
   "   - Opcion A: en Gemini usa pt_bridge_autoconnect {\"dryRun\": false}",
   "   - Opcion B: pega bridge-bootstrap.js y pulsa Run una sola vez",
   "5) Verifica con pt_bridge_status => connected=true.",
   "",
-  "Si editaste main.js y desaparecio Builder Code Editor:",
-  "- Configure PT Script Modules > selecciona Builder > Remove > Add config\\Builder.pts"
+  "Si editaste main.js y desaparecio BridgeBuilder:",
+  "- Configure PT Script Modules > selecciona BridgeBuilder > Remove > Add config\\extension\\BridgeBuilder.pts"
 ].join("\n");
 
 const readme = [

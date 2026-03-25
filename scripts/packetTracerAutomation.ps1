@@ -141,19 +141,19 @@ if ($Action -eq 'ExecuteJS') {
   [System.Windows.Forms.Clipboard]::SetText($code)
 
   # 2) Save to file as backup
-  $codeFilePath = Join-Path (Split-Path $PSScriptRoot) 'config\ptbuilder-pending.js'
+  $codeFilePath = Join-Path (Split-Path $PSScriptRoot) 'config\bridgebuilder-pending.js'
   Set-Content -LiteralPath $codeFilePath -Value $code -Encoding utf8
 
-  # 3) Focus Builder Code Editor (or fallback to Packet Tracer)
+  # 3) Focus BridgeBuilder window (or fallback to Packet Tracer)
   $builderFocused = Test-ActivateWindow -Titles @($builderEditorTitle)
   if (-not $builderFocused) {
     $ptFocused = Test-ActivateWindow -Titles @($packetTracerTitle, 'Packet Tracer', 'Cisco Packet Tracer')
     if (-not $ptFocused) {
-      Write-Output '{"status":"warning","result":"No se pudo enfocar Packet Tracer/Builder. Codigo guardado en config/ptbuilder-pending.js"}'
+      Write-Output '{"status":"warning","result":"No se pudo enfocar Packet Tracer/BridgeBuilder. Codigo guardado en config/bridgebuilder-pending.js"}'
       exit 0
     }
 
-    Write-Output '{"status":"warning","result":"No se detecto Builder Code Editor enfocado. Abre Extensions > Builder Code Editor y reintenta."}'
+    Write-Output '{"status":"warning","result":"No se detecto BridgeBuilder enfocado. Abre Extensions > Scripting > Edit File Script Module > BridgeBuilder y reintenta."}'
     exit 0
   }
 
@@ -183,7 +183,7 @@ if ($Action -eq 'ExecuteJS') {
     Invoke-Delay -Ms $afterRunDelay
   }
 
-  Write-Output '{"status":"success","result":"Codigo JS ejecutado en PTBuilder"}'
+  Write-Output '{"status":"success","result":"Codigo JS ejecutado en BridgeBuilder"}'
   exit 0
 }
 

@@ -189,11 +189,18 @@ export class PacketTracerLiveBridge {
   }
 
   bootstrapScript() {
+    const base = `http://${this.host}:${this.port}`;
     const inner =
       "setInterval(function(){" +
       "var x=new XMLHttpRequest();" +
-      `x.open('GET','http://${this.host}:${this.port}/next',true);` +
-      "x.onload=function(){if(x.status===200&&x.responseText){$se('runCode',x.responseText)}};" +
+      `x.open('GET','${base}/next',true);` +
+      "x.onload=function(){if(x.status===200&&x.responseText){" +
+      "var ok=$se('runCode',x.responseText);" +
+      "var r=new XMLHttpRequest();" +
+      `r.open('POST','${base}/result',true);` +
+      "r.setRequestHeader('Content-Type','text/plain');" +
+      "r.send(ok?'OK':'ERROR:runCode returned false')" +
+      "}};" +
       "x.onerror=function(){};" +
       "x.send()" +
       "},500)";
@@ -460,7 +467,7 @@ export class PacketTracerLiveBridge {
 
         <div class="panel-title">Transport Pipeline</div>
         <div class="panel sunken">
-          <div class="flow"><b>Gemini/Tools</b> <span class="arrow">--></span> <b>MCP Server</b> <span class="arrow">--></span> <b>HTTP /queue</b> <span class="arrow">--></span> <b>Bridge /next</b> <span class="arrow">--></span> <b>PTBuilder $se('runCode')</b> <span class="arrow">--></span> <b>Engine</b></div>
+          <div class="flow"><b>Gemini/Tools</b> <span class="arrow">--></span> <b>MCP Server</b> <span class="arrow">--></span> <b>HTTP /queue</b> <span class="arrow">--></span> <b>Bridge /next</b> <span class="arrow">--></span> <b>BridgeBuilder $se('runCode')</b> <span class="arrow">--></span> <b>Engine</b></div>
         </div>
 
         <div class="panel-title">Event Log</div>
@@ -484,7 +491,7 @@ export class PacketTracerLiveBridge {
         <div class="status-bar">
           <div class="status-pane" id="clock">--:--:--</div>
           <div class="status-pane">Port: 54321</div>
-          <div class="status-pane">Ready</div>
+          <div class="status-pane" id="bridgeHealth">Ready</div>
         </div>
 
       </div>
@@ -499,10 +506,11 @@ export class PacketTracerLiveBridge {
       updateClock();setInterval(updateClock,1000);
 
       /* Pagination state */
-      const PAGE_SIZE=5;
+      const PAGE_SIZE=12;
       let allEvents=[];
       let currentPage=0;
       let totalPages=1;
+      let autoSlide=true;
 
       function setText(id,value,cls){
         const el=document.getElementById(id);
@@ -535,6 +543,13 @@ export class PacketTracerLiveBridge {
         document.getElementById('btnPrev').disabled=currentPage===0;
         document.getElementById('btnNext').disabled=currentPage>=totalPages-1;
         document.getElementById('btnLast').disabled=currentPage>=totalPages-1;
+
+        if(autoSlide){
+          const container=document.querySelector('.table-container');
+          if(container){
+            container.scrollTop=container.scrollHeight;
+          }
+        }
       }
 
       function goPage(p){
@@ -557,14 +572,35 @@ export class PacketTracerLiveBridge {
           setText('results',s.results_received??0);
           setText('lastPollAgo',s.last_poll_ago!==null?Number(s.last_poll_ago).toFixed(1)+'s':'--');
 
+          const health=document.getElementById('bridgeHealth');
+          if(health){
+            if(s.connected && s.polling_active){
+              health.textContent='Connected';
+            } else if(s.running && s.packet_tracer_running){
+              health.textContent='Waiting Poll';
+            } else if(s.running){
+              health.textContent='Waiting PT';
+            } else {
+              health.textContent='Stopped';
+            }
+          }
+
           const lR=await fetch('/logs',{cache:'no-store'});
           const l=await lR.json();
-          allEvents=(l.events||[]).slice(-120).reverse();
+          allEvents=(l.events||[]).slice(-240);
           totalPages=Math.max(1,Math.ceil(allEvents.length/PAGE_SIZE));
-          if(currentPage>=totalPages)currentPage=totalPages-1;
+          if(autoSlide){
+            currentPage=totalPages-1;
+          } else if(currentPage>=totalPages){
+            currentPage=totalPages-1;
+          }
           renderPage()
         }catch(e){
           setText('connected','ERR','bad')
+          const health=document.getElementById('bridgeHealth');
+          if(health){
+            health.textContent='Error';
+          }
         }
       }
 
@@ -591,7 +627,7 @@ export class PacketTracerLiveBridge {
       this.lastPollAt = Date.now();
       this.hasSeenPolling = true;
       this.pollCount += 1;
-      this.setEvent(cmd.length > 0 ? "poll-dispatch" : "poll-idle", `dispatchBytes=${cmd.length}`);
+      this.setEvent(cmd.length > 0 ? "poll-dispatch" : "poll-idle", `dispatchBytes=${cmd.length} queueDepth=${this.commandQueue.length} polls=${this.pollCount}`);
       if (!wasConnected) {
         this.log("Packet Tracer polling detectado (connected=true)");
       }
@@ -652,7 +688,7 @@ export class PacketTracerLiveBridge {
       const body = await this.readBody(req);
       this.resultQueue.enqueue(body);
       this.resultCount += 1;
-      this.setEvent("result-post", `POST /result bytes=${body.length}`);
+      this.setEvent("result-post", `POST /result bytes=${body.length} pendingResults=${this.resultQueue.length}`);
       this.debug(`POST /result bytes=${body.length}`);
       this.respond(res, 200, "ok");
       return;
@@ -663,7 +699,7 @@ export class PacketTracerLiveBridge {
       if (body.trim().length > 0) {
         this.commandQueue.enqueue(body);
         this.queuedCount += 1;
-        this.setEvent("queue-post", `POST /queue bytes=${body.length}`);
+        this.setEvent("queue-post", `POST /queue bytes=${body.length} queueDepth=${this.commandQueue.length}`);
         this.debug(`POST /queue bytes=${body.length} queueDepth=${this.commandQueue.length}`);
       }
       this.respond(res, 200, "queued");

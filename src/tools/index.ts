@@ -6,6 +6,8 @@ import { tmpdir } from "node:os";
 import { ensureLiveBridgeStarted, getLiveBridge } from "../bridge/liveBridge.js";
 
 const BRIDGE_BASE_URL = "http://127.0.0.1:54321";
+
+const LLM_STRICT_RULES = "[REGLAS DE SISTEMA: 1. NO busques ni leas archivos. 2. EJECUTA INMEDIATAMENTE sin explicar. 3. VERIFICACION ESTRICTA: Una vez que termines de crear o conectar equipos, es OBLIGATORIO que uses 'pt_list_devices' para verificar que las conexiones y las IPs realmente se aplicaron. Si algo falló (ej: puerto equivocado), corrígelo. 4. Paraleliza llamadas. 5. Responde con un resumen corto de la validación.] ";
 let lastBridgeRearmAt = 0;
 let bridgeWatchdogStarted = false;
 let bridgeIdleCycles = 0;
@@ -92,7 +94,7 @@ export const toolDefinitions = [
   {
     name: "packet_tracer_build_basic_topology",
     description:
-      "Construye una topologia basica en Cisco Packet Tracer: un router 2911, un switch 2960, un PC, los conecta entre si y configura una IP en el PC. Usa PTBuilder (ScriptModule) internamente.",
+      LLM_STRICT_RULES + "Construye una topologia basica en Cisco Packet Tracer: un router 2911, un switch 2960, un PC, los conecta entre si y configura una IP en el PC. Usa el Script Module BridgeBuilder internamente.",
     inputSchema: {
       type: "object",
       properties: {
@@ -111,7 +113,7 @@ export const toolDefinitions = [
   {
     name: "packet_tracer_add_device",
     description:
-      "Agrega un dispositivo en Packet Tracer. Modelos comunes: 2911, 2901, 1941 (routers), 2960-24TT, 3560-24PS (switches), PC-PT, Server-PT, Laptop-PT.",
+      LLM_STRICT_RULES + "Agrega un dispositivo en Packet Tracer. Modelos comunes: 2911, 2901, 1941 (routers), 2960-24TT, 3560-24PS (switches), PC-PT, Server-PT, Laptop-PT.",
     inputSchema: {
       type: "object",
       properties: {
@@ -128,7 +130,7 @@ export const toolDefinitions = [
   {
     name: "packet_tracer_add_link",
     description:
-      "Conecta dos dispositivos en Packet Tracer. Tipos: auto, straight, cross, fiber, serial, console.",
+      LLM_STRICT_RULES + "Conecta dos dispositivos en Packet Tracer. Tipos: auto, straight, cross, fiber, serial, console.",
     inputSchema: {
       type: "object",
       properties: {
@@ -146,7 +148,7 @@ export const toolDefinitions = [
   {
     name: "packet_tracer_configure_device",
     description:
-      "Envia comandos IOS a un dispositivo Cisco en Packet Tracer (ej: hostname, interfaces, rutas).",
+      LLM_STRICT_RULES + "Envia comandos IOS a un dispositivo Cisco en Packet Tracer (ej: hostname, interfaces, rutas).",
     inputSchema: {
       type: "object",
       properties: {
@@ -161,7 +163,7 @@ export const toolDefinitions = [
   {
     name: "packet_tracer_configure_pc_ip",
     description:
-      "Configura la IP de un PC o Server en Packet Tracer.",
+      LLM_STRICT_RULES + "Configura la IP de un PC o Server en Packet Tracer.",
     inputSchema: {
       type: "object",
       properties: {
@@ -180,11 +182,11 @@ export const toolDefinitions = [
   {
     name: "packet_tracer_run_js",
     description:
-      "Ejecuta codigo JavaScript personalizado en PTBuilder dentro de Packet Tracer. Funciones disponibles: addDevice, addLink, addModule, configureIosDevice, configurePcIp, getDevices.",
+      "Ejecuta codigo JavaScript personalizado en BridgeBuilder dentro de Packet Tracer. Funciones disponibles: addDevice, addLink, addModule, configureIosDevice, configurePcIp, getDevices.",
     inputSchema: {
       type: "object",
       properties: {
-        jsCode: { type: "string", description: "Codigo JavaScript a ejecutar en PTBuilder" },
+        jsCode: { type: "string", description: "Codigo JavaScript a ejecutar en BridgeBuilder" },
         dryRun: { type: "boolean", description: "Solo muestra el codigo sin ejecutarlo" }
       },
       required: ["jsCode"],
@@ -194,11 +196,11 @@ export const toolDefinitions = [
   {
     name: "pt_execute_js",
     description:
-      "Compatibilidad estilo cisco-pt-mcp. Ejecuta codigo JavaScript PTBuilder (input: code).",
+      LLM_STRICT_RULES + "Compatibilidad estilo cisco-pt-mcp. Ejecuta codigo JavaScript BridgeBuilder (input: code).",
     inputSchema: {
       type: "object",
       properties: {
-        code: { type: "string", description: "Codigo JS PTBuilder a ejecutar" },
+        code: { type: "string", description: "Codigo JS BridgeBuilder a ejecutar" },
         dryRun: { type: "boolean", description: "Solo muestra el codigo sin ejecutarlo" }
       },
       required: ["code"],
@@ -208,7 +210,7 @@ export const toolDefinitions = [
   {
     name: "pt_list_devices",
     description:
-      "Genera y ejecuta un script JS para listar dispositivos del workspace en PTBuilder.",
+      "Genera y ejecuta un script JS para listar dispositivos del workspace en BridgeBuilder.",
     inputSchema: {
       type: "object",
       properties: {
@@ -220,7 +222,7 @@ export const toolDefinitions = [
   {
     name: "pt_full_build",
     description:
-      "Pipeline en lenguaje natural: crea/ajusta topologia (router, switch, PCs, server), conecta, configura IP/gateway y puede reiniciar desde cero.",
+      LLM_STRICT_RULES + "Pipeline en lenguaje natural: crea/ajusta topologia (router, switch, PCs, server), conecta, configura IP/gateway y puede reiniciar desde cero.",
     inputSchema: {
       type: "object",
       properties: {
@@ -234,7 +236,7 @@ export const toolDefinitions = [
   {
     name: "pt_bridge_status",
     description:
-      "Verifica si el Bridge HTTP interno esta activo y si Packet Tracer (PTBuilder) esta conectado por polling.",
+      "Verifica si el Bridge HTTP interno esta activo y si Packet Tracer (BridgeBuilder) esta conectado por polling.",
     inputSchema: {
       type: "object",
       properties: {},
@@ -244,7 +246,7 @@ export const toolDefinitions = [
   {
     name: "pt_bridge_autoconnect",
     description:
-      "Inyecta automaticamente el bootstrap del bridge en Builder Code Editor para conectar Packet Tracer sin pegar manualmente.",
+      "Inyecta automaticamente el bootstrap del bridge en la ventana BridgeBuilder para conectar Packet Tracer sin pegar manualmente.",
     inputSchema: {
       type: "object",
       properties: {
@@ -257,7 +259,7 @@ export const toolDefinitions = [
   {
     name: "pt_send_raw",
     description:
-      "Envia JS arbitrario al bridge en vivo. Si waitResult=true, espera resultado via /result (requiere reportResult en PTBuilder).",
+      "Envia JS arbitrario al bridge en vivo. Si waitResult=true, espera resultado via /result (requiere reportResult en BridgeBuilder).",
     inputSchema: {
       type: "object",
       properties: {
@@ -273,7 +275,7 @@ export const toolDefinitions = [
   {
     name: "pt_export_bridge_extension",
     description:
-      "Genera kit bridge para PTBuilder conectado al bridge MCP (bootstrap y guia).",
+      "Genera kit bridge para BridgeBuilder conectado al bridge MCP (bootstrap y guia).",
     inputSchema: {
       type: "object",
       properties: {
@@ -289,10 +291,10 @@ ensureLiveBridgeStarted();
 startBridgeWatchdog();
 
 // ---------------------------------------------------------------------------
-// JS code execution via PowerShell + PTBuilder
+// JS code execution via PowerShell + BridgeBuilder
 // ---------------------------------------------------------------------------
 
-function executeJsViaPTBuilder(jsCode: string, dryRun: boolean, profilePathOverride?: string): string {
+function executeJsViaBridgeBuilder(jsCode: string, dryRun: boolean, profilePathOverride?: string): string {
   const scriptPath = resolve(process.cwd(), "scripts/packetTracerAutomation.ps1");
   const defaultProfilePath = resolve(process.cwd(), "config", "packet-tracer-profile.json");
   const profilePath = profilePathOverride ? resolve(profilePathOverride) : defaultProfilePath;
@@ -310,7 +312,7 @@ function executeJsViaPTBuilder(jsCode: string, dryRun: boolean, profilePathOverr
   if (!existsSync(tempDir)) {
     mkdirSync(tempDir, { recursive: true });
   }
-  const tempJsFile = resolve(tempDir, `ptbuilder_${Date.now()}.js`);
+  const tempJsFile = resolve(tempDir, `bridgebuilder_${Date.now()}.js`);
   writeFileSync(tempJsFile, jsCode, "utf-8");
 
   const psArgs = [
@@ -335,7 +337,7 @@ function executeJsViaPTBuilder(jsCode: string, dryRun: boolean, profilePathOverr
   }
 
   if (result.status !== 0) {
-    throw new Error(result.stderr || "Fallo la ejecucion de PTBuilder.");
+    throw new Error(result.stderr || "Fallo la ejecucion de BridgeBuilder.");
   }
 
   const output = result.stdout || "Ejecucion completada sin salida.";
@@ -352,59 +354,71 @@ function executeJsPreferBridge(jsCode: string, dryRun: boolean, profilePathOverr
       if (now - lastBridgeRearmAt > 5000) {
         lastBridgeRearmAt = now;
         try {
-          const bridge = getLiveBridge();
-          const bootstrap = bridge.bootstrapScript();
-          executeJsViaPTBuilder(bootstrap, false, profilePathOverride);
+          const bootstrap = getLiveBridge().bootstrapScript();
+          executeJsViaBridgeBuilder(bootstrap, false, profilePathOverride);
         }
         catch {
-          // ignora: se intentara via /queue o fallback normal
+          // ignora: se intentara via enqueue o fallback normal
         }
       }
     }
 
     const queued = bridgeHttpQueue(jsCode);
     if (queued) {
+      // Esperar resultado real de PT (max 8s)
+      const ptResult = bridgeHttpWaitResult(8000);
       const refreshed = bridgeHttpGetStatus();
       return JSON.stringify({
-        status: "success",
+        status: ptResult ? "success" : "queued",
         transport: "bridge-http",
         bridge: {
-          connected: Boolean(refreshed?.connected ?? httpStatus?.connected),
-          running: Boolean(refreshed?.running ?? httpStatus?.running),
-          queueDepth: Number(refreshed?.queueDepth ?? httpStatus?.queueDepth ?? 0),
-          polls: Number(refreshed?.polls ?? httpStatus?.polls ?? 0),
-          lastEvent: String(refreshed?.lastEvent ?? httpStatus?.lastEvent ?? "unknown")
+          connected: Boolean(refreshed?.connected),
+          running: Boolean(refreshed?.running),
+          queueDepth: Number(refreshed?.queueDepth ?? 0),
+          polls: Number(refreshed?.polls ?? 0),
+          resultsReceived: Number(refreshed?.resultsReceived ?? 0),
+          lastEvent: String(refreshed?.lastEvent ?? "unknown")
         },
-        result: "Comando encolado y enviado a Packet Tracer por bridge (/next)."
+        ptResult: ptResult ?? "Sin respuesta (timeout 8s). El comando fue encolado y puede ejecutarse luego.",
+        result: ptResult ? "Comando ejecutado en Packet Tracer." : "Comando encolado, sin confirmacion de PT."
       });
     }
   }
 
-  const fallback = executeJsViaPTBuilder(jsCode, dryRun, profilePathOverride);
+  const fallback = executeJsViaBridgeBuilder(jsCode, dryRun, profilePathOverride);
   return `${fallback}\n${JSON.stringify({
-    transport: "ptbuilder-ui-fallback",
-    bridgeConnected: Boolean(httpStatus?.connected),
+    transport: "bridgebuilder-ui-fallback",
+    bridgeConnected: connected,
     note: "Bridge no conectado; se uso ejecucion UI directa."
   })}`;
 }
 
 function bridgeHttpGetStatus(): { [key: string]: unknown } | null {
-  const cmd = `try { (Invoke-WebRequest -Uri '${BRIDGE_BASE_URL}/status' -UseBasicParsing -TimeoutSec 2).Content } catch { '' }`;
-  const result = spawnSync("powershell", ["-NoProfile", "-Command", cmd], {
-    encoding: "utf-8",
-    timeout: 5000
-  });
-
-  if (result.error) {
-    return null;
-  }
-
-  const raw = (result.stdout ?? "").trim();
-  if (!raw) {
-    return null;
-  }
-
   try {
+    const bridge = getLiveBridge();
+    const s = bridge.getStatus();
+
+    // If local bridge is running, use in-process data
+    if (s.running) {
+      return {
+        connected: s.connected,
+        pollingActive: s.pollingActive,
+        packetTracerRunning: s.packetTracerRunning,
+        running: s.running,
+        queueDepth: s.queueDepth,
+        lastPollAgo: s.lastPollAgoSeconds,
+        polls: s.polls,
+        queued: s.queued,
+        resultsReceived: s.resultsReceived,
+        lastEvent: s.lastEvent
+      };
+    }
+
+    // Fallback: port in use by external bridge, query via HTTP
+    const script = `const http=require('http');const r=http.get('http://127.0.0.1:54321/status',{timeout:2000},s=>{let d='';s.on('data',c=>d+=c);s.on('end',()=>process.stdout.write(d))});r.on('error',()=>{});r.on('timeout',()=>r.destroy())`;
+    const result = spawnSync("node", ["-e", script], { encoding: "utf-8", timeout: 4000 });
+    const raw = (result.stdout ?? "").trim();
+    if (!raw) return null;
     const parsed = JSON.parse(raw) as { [key: string]: unknown };
     return {
       connected: parsed.connected,
@@ -418,31 +432,45 @@ function bridgeHttpGetStatus(): { [key: string]: unknown } | null {
       resultsReceived: parsed.results_received,
       lastEvent: parsed.last_event
     };
-  }
-  catch {
+  } catch {
     return null;
   }
 }
 
 function bridgeHttpQueue(jsCode: string): boolean {
-  const escaped = jsCode.replace(/'/g, "''");
-  const cmd = `$body='${escaped}'; try { $r = Invoke-WebRequest -Uri '${BRIDGE_BASE_URL}/queue' -Method POST -Body $body -ContentType 'text/plain' -UseBasicParsing -TimeoutSec 3; if($r.StatusCode -eq 200){'OK'} else {'FAIL'} } catch { 'FAIL' }`;
-  const result = spawnSync("powershell", ["-NoProfile", "-Command", cmd], {
-    encoding: "utf-8",
-    timeout: 8000
-  });
+  try {
+    const bridge = getLiveBridge();
+    if (bridge.getStatus().running) {
+      // Local bridge is alive, enqueue directly
+      bridge.enqueue(jsCode);
+      return true;
+    }
 
-  if (result.error) {
+    // Fallback: POST to external bridge via HTTP
+    const escaped = JSON.stringify(jsCode);
+    const script = `const http=require('http');const d=${escaped};const o={hostname:'127.0.0.1',port:54321,path:'/queue',method:'POST',headers:{'Content-Type':'text/plain','Content-Length':Buffer.byteLength(d)},timeout:3000};const r=http.request(o,s=>{let b='';s.on('data',c=>b+=c);s.on('end',()=>process.stdout.write(s.statusCode===200?'OK':'FAIL'))});r.on('error',()=>process.stdout.write('FAIL'));r.on('timeout',()=>{r.destroy();process.stdout.write('FAIL')});r.write(d);r.end()`;
+    const result = spawnSync("node", ["-e", script], { encoding: "utf-8", timeout: 6000 });
+    return (result.stdout ?? "").trim().includes("OK");
+  } catch {
     return false;
   }
-
-  return (result.stdout ?? "").trim().includes("OK");
 }
 
 function bridgeHttpWaitResult(timeoutMs: number): string | null {
-  const timeoutSec = Math.max(1, Math.ceil(timeoutMs / 1000));
-  const cmd = `try { $r = Invoke-WebRequest -Uri '${BRIDGE_BASE_URL}/result' -UseBasicParsing -TimeoutSec ${timeoutSec}; if($r.StatusCode -eq 200){$r.Content}else{''} } catch { '' }`;
-  const result = spawnSync("powershell", ["-NoProfile", "-Command", cmd], {
+  // Use spawnSync to block the current thread while waiting for the async result
+  const script = `
+    const http = require('http');
+    const options = { hostname: '127.0.0.1', port: 54321, path: '/result', method: 'GET', timeout: ${timeoutMs} };
+    const req = http.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => process.stdout.write(data));
+    });
+    req.on('error', () => {});
+    req.on('timeout', () => { req.destroy(); });
+    req.end();
+  `;
+  const result = spawnSync("node", ["-e", script], {
     encoding: "utf-8",
     timeout: timeoutMs + 2000
   });
@@ -480,7 +508,7 @@ function startBridgeWatchdog() {
         return;
       }
 
-      const looksIdle = !pollingActive || !connected || lastPollAgo > 8;
+      const looksIdle = !pollingActive || !connected || lastPollAgo > 12;
       if (!looksIdle) {
         bridgeIdleCycles = 0;
         return;
@@ -498,7 +526,7 @@ function startBridgeWatchdog() {
 
       lastBridgeRearmAt = now;
       const bootstrap = getLiveBridge().bootstrapScript();
-      executeJsViaPTBuilder(bootstrap, false);
+      executeJsViaBridgeBuilder(bootstrap, false);
       bridgeIdleCycles = 0;
     }
     catch {
@@ -521,13 +549,13 @@ function exportBridgeExtension(outputDirOverride?: string, bridgeUrlOverride?: s
   const bootstrap = `/* Bridge */ window.webview.evaluateJavaScriptAsync("setInterval(function(){var x=new XMLHttpRequest();x.open('GET','${bridgeUrl}/next',true);x.onload=function(){if(x.status===200&&x.responseText){$se('runCode',x.responseText)}};x.onerror=function(){};x.send()},350)");`;
 
   const installSteps = [
-    "1) NO reemplaces archivos core del modulo Builder (main.js, userfunctions.js, runcode.js, etc.).",
-    "2) Abre Packet Tracer > Extensions > Builder Code Editor.",
+    "1) NO reemplaces archivos core del modulo BridgeBuilder (main.js, userfunctions.js, runcode.js, etc.).",
+    "2) Abre Packet Tracer > Extensions > Scripting > Edit File Script Module > BridgeBuilder.",
     "3) Inyecta bridge con pt_bridge_autoconnect o pegando bridge-bootstrap.js y pulsando Run.",
     "4) Desde Gemini ejecuta pt_bridge_status para verificar connected=true.",
     "5) Luego usa pt_full_build o pt_execute_js normalmente.",
     "",
-    "Si Builder Code Editor desaparece, reinstala config/Builder.pts desde Configure PT Script Modules."
+    "Si BridgeBuilder desaparece, reinstala config/extension/BridgeBuilder.pts desde Configure PT Script Modules."
   ].join("\n");
 
   const bootstrapPath = resolve(outputDir, "bridge-bootstrap.js");
@@ -797,7 +825,7 @@ export function executeTool(name: string, args: unknown) {
     const bridge = getLiveBridge();
     const bootstrap = bridge.bootstrapScript();
 
-    const output = executeJsViaPTBuilder(bootstrap, dryRun, parsed.profilePath);
+    const output = executeJsViaBridgeBuilder(bootstrap, dryRun, parsed.profilePath);
     const status = bridge.getStatus();
     const text = [
       output,
