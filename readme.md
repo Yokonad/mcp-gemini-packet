@@ -17,12 +17,18 @@
 
 ---
 
-## <span style="color:#FF007F">Requisitos</span>
+## <span style="color:#FF007F">Requisitos y Configuración Previa</span>
 
-- Windows
-- Node.js 18+
-- Cisco Packet Tracer instalado
-- Gemini CLI instalado
+Para que el servidor MCP se comunique correctamente, asegúrate de tener todo esto listo antes de iniciar:
+
+1. **Sistema Operativo:** Windows.
+2. **Node.js:** Versión 18 o superior instalada.
+3. **Cisco Packet Tracer:** Instalado y cerrado (el launcher lo abrirá por ti).
+4. **Extensión PTBuilder (Crucial):** Packet Tracer necesita esta extensión para permitir inyección de scripts. Puedes instalarla fácilmente haciendo doble clic o ejecutando el script incluido:
+   ```powershell
+   .\scripts\install-ptbuilder.ps1
+   ```
+5. **Gemini CLI:** Debes tenerlo instalado globalmente (`npm install -g @google/gemini-cli`). Si es tu primera vez usándolo, asegúrate de haber ejecutado antes `gemini login` para autorizar tu cuenta.
 
 ## <span style="color:#FF007F">Instalación</span>
 
