@@ -49,7 +49,7 @@ El launcher:
 3. Arranca MCP server automaticamente.
 4. Abre Gemini CLI.
 
-### ⚠️ Activación MANUAL del Bridge en Packet Tracer
+###  Activación MANUAL del Bridge en Packet Tracer
 Aunque el launcher abre todo automáticamente, el puente de comunicación requiere que actives el script dentro de Packet Tracer:
 1. Ve al menú superior y selecciona **`Extensions`** -> **`Scripting`** -> **`Builder Code Editor`**.
 2. Asegúrate de tener el código JavaScript del bridge pegado ahí (si no lo tienes, puedes pedírselo a Gemini con la herramienta `pt_export_bridge_extension`).
