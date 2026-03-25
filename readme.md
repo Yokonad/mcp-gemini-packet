@@ -1,6 +1,6 @@
 <div align="center">
 
-# <span style="color:#00F0FF">MCP PACKET TRACER</span>
+![MCP PACKET TRACER](https://img.shields.io/badge/MCP_PACKET_TRACER-00F0FF?style=for-the-badge&labelColor=000000)
 
 **Servidor MCP para controlar Cisco Packet Tracer con Gemini CLI usando tools en lenguaje natural.**
 
@@ -17,27 +17,27 @@
 
 ---
 
-## <span style="color:#FF007F">Requisitos y Configuración Previa</span>
+![Requisitos](https://img.shields.io/badge/REQUISITOS_Y_CONFIGURACION-FF007F?style=for-the-badge)
 
 Para que el servidor MCP se comunique correctamente, asegúrate de tener todo esto listo antes de iniciar:
 
 1. **Sistema Operativo:** Windows.
 2. **Node.js:** Versión 18 o superior instalada.
 3. **Cisco Packet Tracer:** Instalado y cerrado (el launcher lo abrirá por ti).
-4. **Extensión PTBuilder (Crucial):** Packet Tracer necesita esta extensión para permitir inyección de scripts. Puedes instalarla fácilmente haciendo doble clic o ejecutando el script incluido:
+4. **Extensión PTBuilder (Crucial):** Packet Tracer necesita esta extensión para permitir inyección de scripts. Puedes instalarla fácilmente ejecutando el script incluido:
    ```powershell
    .\scripts\install-ptbuilder.ps1
    ```
 5. **Gemini CLI:** Debes tenerlo instalado globalmente (`npm install -g @google/gemini-cli`). Si es tu primera vez usándolo, asegúrate de haber ejecutado antes `gemini login` para autorizar tu cuenta.
 
-## <span style="color:#FF007F">Instalación</span>
+![Instalacion](https://img.shields.io/badge/INSTALACION-FF007F?style=for-the-badge)
 
 ```powershell
 npm install
 npm run build
 ```
 
-## <span style="color:#FF007F">Inicio Rápido</span>
+![Inicio](https://img.shields.io/badge/INICIO_RAPIDO-FF007F?style=for-the-badge)
 
 ```powershell
 .\run-mcp-packet-tracer.cmd
@@ -49,7 +49,13 @@ El launcher:
 3. Arranca MCP server automaticamente.
 4. Abre Gemini CLI.
 
-## <span style="color:#FF007F">Tools Principales</span>
+### ⚠️ Activación MANUAL del Bridge en Packet Tracer
+Aunque el launcher abre todo automáticamente, el puente de comunicación requiere que actives el script dentro de Packet Tracer:
+1. Ve al menú superior y selecciona **`Extensions`** -> **`Scripting`** -> **`Builder Code Editor`**.
+2. Asegúrate de tener el código JavaScript del bridge pegado ahí (si no lo tienes, puedes pedírselo a Gemini con la herramienta `pt_export_bridge_extension`).
+3. **¡Haz clic en RUN!** para iniciar la comunicación. Deja la ventanita abierta o minimizada mientras trabajas.
+
+![Tools](https://img.shields.io/badge/TOOLS_PRINCIPALES-FF007F?style=for-the-badge)
 
 | Tool | Descripcion |
 |------|-------------|
@@ -64,14 +70,14 @@ El launcher:
 | `pt_send_raw` | Envia codigo JS raw al bridge |
 | `pt_export_bridge_extension` | Exporta extension del bridge |
 
-## <span style="color:#FF007F">Diagnóstico</span>
+![Diagnostico](https://img.shields.io/badge/DIAGNOSTICO-FF007F?style=for-the-badge)
 
 | Endpoint | URL |
 |----------|-----|
 | Monitor visual | `http://127.0.0.1:54321/monitor` |
 | Estado JSON | `http://127.0.0.1:54321/status` |
 
-## <span style="color:#FF007F">Notas</span>
+![Notas](https://img.shields.io/badge/NOTAS-FF007F?style=for-the-badge)
 
 - Manten abierto Builder Code Editor (puede estar minimizado).
 - Si algo no ejecuta, corre `pt_bridge_autoconnect` y luego `pt_bridge_status`.
