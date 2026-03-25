@@ -1,6 +1,6 @@
 <div align="center">
 
-# <span style="color:#00f0ff">mcp-packet-tracer</span>
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=700&size=40&pause=1000&color=00F0FF&colorAlt=FF007F&center=true&vCenter=true&width=600&lines=MCP+PACKET+TRACER" alt="Typing SVG" />
 
 **Servidor MCP para controlar Cisco Packet Tracer con Gemini CLI usando tools en lenguaje natural.**
 
@@ -8,25 +8,32 @@
 [![Cisco](https://img.shields.io/badge/Cisco-Packet%20Tracer-1BA0D7?style=flat-square&logo=cisco&logoColor=white)](https://www.netacad.com/courses/packet-tracer)
 [![MCP](https://img.shields.io/badge/Protocol-MCP-blueviolet?style=flat-square)](https://modelcontextprotocol.io/)
 
+<!-- GIF ANIMADO DE KONATA AQUI -->
+<div align="center">
+<div class="tenor-gif-embed" data-postid="15680289644544200178" data-share-method="host" data-aspect-ratio="1" data-width="100%"><a href="https://tenor.com/view/konata-lucky-star-thinking-loading-anime-gif-15680289644544200178">Konata Lucky Star GIF</a>from <a href="https://tenor.com/search/konata-gifs">Konata GIFs</a></div>
+<script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+</div>
+<br>
+
 </div>
 
 ---
 
-## <span style="color:#00ff88">Requisitos</span>
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&pause=1000&color=FF007F&width=400&lines=Requisitos" alt="Requisitos" />
 
 - Windows
 - Node.js 18+
 - Cisco Packet Tracer instalado
 - Gemini CLI instalado
 
-## <span style="color:#00ff88">Instalacion</span>
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&pause=1000&color=FF007F&width=400&lines=Instalación" alt="Instalación" />
 
 ```powershell
 npm install
 npm run build
 ```
 
-## <span style="color:#00ff88">Inicio Rapido</span>
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&pause=1000&color=FF007F&width=400&lines=Inicio+Rápido" alt="Inicio Rápido" />
 
 ```powershell
 .\run-mcp-packet-tracer.cmd
@@ -38,7 +45,7 @@ El launcher:
 3. Arranca MCP server automaticamente.
 4. Abre Gemini CLI.
 
-## <span style="color:#00ff88">Tools Principales</span>
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&pause=1000&color=FF007F&width=400&lines=Tools+Principales" alt="Tools Principales" />
 
 | Tool | Descripcion |
 |------|-------------|
@@ -53,14 +60,14 @@ El launcher:
 | `pt_send_raw` | Envia codigo JS raw al bridge |
 | `pt_export_bridge_extension` | Exporta extension del bridge |
 
-## <span style="color:#00ff88">Diagnostico</span>
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&pause=1000&color=FF007F&width=400&lines=Diagnóstico" alt="Diagnóstico" />
 
 | Endpoint | URL |
 |----------|-----|
 | Monitor visual | `http://127.0.0.1:54321/monitor` |
 | Estado JSON | `http://127.0.0.1:54321/status` |
 
-## <span style="color:#00ff88">Notas</span>
+<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&weight=600&size=24&pause=1000&color=FF007F&width=400&lines=Notas" alt="Notas" />
 
 - Manten abierto Builder Code Editor (puede estar minimizado).
 - Si algo no ejecuta, corre `pt_bridge_autoconnect` y luego `pt_bridge_status`.
