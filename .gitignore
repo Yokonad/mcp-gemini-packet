@@ -1,0 +1,13 @@
+node_modules/
+dist/
+config/
+.env
+.gemini/
+.vscode/
+
+# Ignore context and sensitive docs requested by user
+contexto-ia.md
+
+# Ignore local labs and logs
+*.pkt
+*.log

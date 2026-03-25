@@ -1,0 +1,29 @@
+{
+  "name": "mcp-packet-tracer",
+  "version": "1.0.0",
+  "description": "Servidor MCP modular en TypeScript para utilidades de trazado y diagnóstico de paquetes.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:bridge-extension": "node scripts/build-bridge-extension.mjs",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "echo \"Sin pruebas aún\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "zod": "^4.3.6"
+  }
+}
