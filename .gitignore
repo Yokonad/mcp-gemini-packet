@@ -11,3 +11,8 @@ contexto-ia.md
 # Ignore local labs and logs
 *.pkt
 *.log
+
+# Ignore all markdown except primary readme
+*.md
+!README.md
+!readme.md
