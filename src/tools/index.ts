@@ -7,7 +7,7 @@ import { ensureLiveBridgeStarted, getLiveBridge } from "../bridge/liveBridge.js"
 
 const BRIDGE_BASE_URL = "http://127.0.0.1:54321";
 
-const LLM_STRICT_RULES = "[REGLAS DE SISTEMA: 1. NO busques ni leas archivos. 2. EJECUTA INMEDIATAMENTE sin explicar. 3. VERIFICACION ESTRICTA: Una vez que termines de crear o conectar equipos, es OBLIGATORIO que uses 'pt_list_devices' para verificar que las conexiones y las IPs realmente se aplicaron. Si algo falló (ej: puerto equivocado), corrígelo. 4. Paraleliza llamadas. 5. Responde con un resumen corto de la validación.] ";
+const LLM_STRICT_RULES = "[REGLAS DE SISTEMA: 1. NO busques ni leas archivos. 2. EJECUTA INMEDIATAMENTE sin explicar. 3. VERIFICACION ESTRICTA: Una vez que termines de crear o conectar equipos, es OBLIGATORIO que uses 'pt_list_devices' para verificar que las conexiones y las IPs realmente se aplicaron. Si algo falló (ej: puerto equivocado), corrígelo. 4. NO paralelices llamadas de configuración: ejecuta una por una y espera confirmación. 5. Responde con un resumen corto de la validación.] ";
 let lastBridgeRearmAt = 0;
 let bridgeWatchdogStarted = false;
 let bridgeIdleCycles = 0;
@@ -363,14 +363,28 @@ function executeJsPreferBridge(jsCode: string, dryRun: boolean, profilePathOverr
       }
     }
 
+    try {
+      const localBridge = getLiveBridge();
+      if (localBridge.getStatus().running) {
+        localBridge.clearPendingResults();
+      }
+    } catch {
+      // best-effort
+    }
+
     const queued = bridgeHttpQueue(jsCode);
     if (queued) {
-      // Esperar resultado real de PT (max 8s)
-      const ptResult = bridgeHttpWaitResult(8000);
+      // Esperar resultado real de PT con margen de arranque/dispositivo (max 20s)
+      const ptResult = bridgeHttpWaitResult(20000);
       const refreshed = bridgeHttpGetStatus();
+      const normalizedResult = (ptResult ?? "").trim();
+      const hasResult = normalizedResult.length > 0;
+      const isError = hasResult && normalizedResult.toUpperCase().startsWith("ERROR");
+      const confirmed = hasResult && !isError;
       return JSON.stringify({
-        status: ptResult ? "success" : "queued",
+        status: isError ? "error" : (confirmed ? "success" : "queued_unconfirmed"),
         transport: "bridge-http",
+        confirmed,
         bridge: {
           connected: Boolean(refreshed?.connected),
           running: Boolean(refreshed?.running),
@@ -379,8 +393,10 @@ function executeJsPreferBridge(jsCode: string, dryRun: boolean, profilePathOverr
           resultsReceived: Number(refreshed?.resultsReceived ?? 0),
           lastEvent: String(refreshed?.lastEvent ?? "unknown")
         },
-        ptResult: ptResult ?? "Sin respuesta (timeout 8s). El comando fue encolado y puede ejecutarse luego.",
-        result: ptResult ? "Comando ejecutado en Packet Tracer." : "Comando encolado, sin confirmacion de PT."
+        ptResult: hasResult ? normalizedResult : "NO_CONFIRMADO: sin respuesta de PT en 20s. El comando sigue en cola o en ejecución.",
+        result: isError
+          ? "Error confirmado por PT."
+          : (confirmed ? "Comando ejecutado y confirmado por Packet Tracer." : "Comando encolado, sin confirmación de PT (NO asumir aplicado).")
       });
     }
   }
@@ -546,7 +562,7 @@ function exportBridgeExtension(outputDirOverride?: string, bridgeUrlOverride?: s
   rmSync(outputDir, { recursive: true, force: true });
   mkdirSync(outputDir, { recursive: true });
 
-  const bootstrap = `/* Bridge */ window.webview.evaluateJavaScriptAsync("setInterval(function(){var x=new XMLHttpRequest();x.open('GET','${bridgeUrl}/next',true);x.onload=function(){if(x.status===200&&x.responseText){$se('runCode',x.responseText)}};x.onerror=function(){};x.send()},350)");`;
+  const bootstrap = `/* Bridge */ window.webview.evaluateJavaScriptAsync("(function(){var w=window;if(w.__PT_MCP_BRIDGE_TIMER){clearInterval(w.__PT_MCP_BRIDGE_TIMER);}w.__PT_MCP_BRIDGE_ERRORS=0;w.__PT_MCP_BRIDGE_TIMER=setInterval(function(){var x=new XMLHttpRequest();x.open('GET','${bridgeUrl}/next',true);x.timeout=1500;x.onload=function(){if(x.status===200){w.__PT_MCP_BRIDGE_ERRORS=0;if(x.responseText){$se('runCode',x.responseText)}return;}w.__PT_MCP_BRIDGE_ERRORS=(w.__PT_MCP_BRIDGE_ERRORS||0)+1;if(w.__PT_MCP_BRIDGE_ERRORS>=6&&w.__PT_MCP_BRIDGE_TIMER){clearInterval(w.__PT_MCP_BRIDGE_TIMER);w.__PT_MCP_BRIDGE_TIMER=null;}};x.onerror=function(){w.__PT_MCP_BRIDGE_ERRORS=(w.__PT_MCP_BRIDGE_ERRORS||0)+1;if(w.__PT_MCP_BRIDGE_ERRORS>=6&&w.__PT_MCP_BRIDGE_TIMER){clearInterval(w.__PT_MCP_BRIDGE_TIMER);w.__PT_MCP_BRIDGE_TIMER=null;}};x.ontimeout=x.onerror;x.send()},350);})();");`;
 
   const installSteps = [
     "1) NO reemplaces archivos core del modulo BridgeBuilder (main.js, userfunctions.js, runcode.js, etc.).",

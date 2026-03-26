@@ -669,6 +669,7 @@ function Ensure-McpServerRunning {
   }
 
   Write-Host "Iniciando MCP server automaticamente..." -ForegroundColor Magenta
+  $env:PT_MCP_OWNER_PID = "$PID"
   Start-Process -FilePath "node" -ArgumentList "dist/index.js" -WorkingDirectory $projectRoot -WindowStyle Hidden | Out-Null
   Start-Sleep -Milliseconds 500
 }

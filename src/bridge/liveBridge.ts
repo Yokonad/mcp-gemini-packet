@@ -183,6 +183,15 @@ export class PacketTracerLiveBridge {
     this.debug(`enqueue queueDepth=${this.commandQueue.length}`);
   }
 
+  clearPendingResults() {
+    const dropped = this.resultQueue.clear();
+    if (dropped > 0) {
+      this.setEvent("result-clear", `Resultados pendientes descartados=${dropped}`);
+      this.debug(`resultQueue cleared dropped=${dropped}`);
+    }
+    return dropped;
+  }
+
   async sendAndWait(jsCode: string, timeoutMs = 10000): Promise<string | null> {
     this.enqueue(jsCode);
     return this.resultQueue.dequeueWithTimeout(timeoutMs);
@@ -191,19 +200,22 @@ export class PacketTracerLiveBridge {
   bootstrapScript() {
     const base = `http://${this.host}:${this.port}`;
     const inner =
-      "setInterval(function(){" +
+      "(function(){var w=window;if(w.__PT_MCP_BRIDGE_TIMER){clearInterval(w.__PT_MCP_BRIDGE_TIMER);}w.__PT_MCP_BRIDGE_ERRORS=0;w.__PT_MCP_BRIDGE_TIMER=setInterval(function(){" +
       "var x=new XMLHttpRequest();" +
       `x.open('GET','${base}/next',true);` +
-      "x.onload=function(){if(x.status===200&&x.responseText){" +
+      "x.timeout=1500;" +
+      "x.onload=function(){if(x.status===200){w.__PT_MCP_BRIDGE_ERRORS=0;if(x.responseText){" +
       "var ok=$se('runCode',x.responseText);" +
       "var r=new XMLHttpRequest();" +
       `r.open('POST','${base}/result',true);` +
       "r.setRequestHeader('Content-Type','text/plain');" +
-      "r.send(ok?'OK':'ERROR:runCode returned false')" +
-      "}};" +
-      "x.onerror=function(){};" +
+      "r.send(ok?'OK':'ERROR:runCode returned false')}return;}" +
+      "w.__PT_MCP_BRIDGE_ERRORS=(w.__PT_MCP_BRIDGE_ERRORS||0)+1;" +
+      "if(w.__PT_MCP_BRIDGE_ERRORS>=6&&w.__PT_MCP_BRIDGE_TIMER){clearInterval(w.__PT_MCP_BRIDGE_TIMER);w.__PT_MCP_BRIDGE_TIMER=null;}};" +
+      "x.onerror=function(){w.__PT_MCP_BRIDGE_ERRORS=(w.__PT_MCP_BRIDGE_ERRORS||0)+1;if(w.__PT_MCP_BRIDGE_ERRORS>=6&&w.__PT_MCP_BRIDGE_TIMER){clearInterval(w.__PT_MCP_BRIDGE_TIMER);w.__PT_MCP_BRIDGE_TIMER=null;}};" +
+      "x.ontimeout=x.onerror;" +
       "x.send()" +
-      "},500)";
+      "},500);})();";
 
     return `/* PT-MCP Bridge */ window.webview.evaluateJavaScriptAsync("${inner}");`;
   }

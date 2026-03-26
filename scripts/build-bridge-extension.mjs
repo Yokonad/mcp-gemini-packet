@@ -18,7 +18,7 @@ if (fs.existsSync(outputDir)) {
   fs.rmSync(outputDir, { recursive: true, force: true });
 }
 
-const bootstrap = `/* Bridge */ window.webview.evaluateJavaScriptAsync("setInterval(function(){var x=new XMLHttpRequest();x.open('GET','${bridgeUrl}/next',true);x.onload=function(){if(x.status===200&&x.responseText){$se('runCode',x.responseText)}};x.onerror=function(){};x.send()},350)");`;
+const bootstrap = `/* Bridge */ window.webview.evaluateJavaScriptAsync("(function(){var w=window;if(w.__PT_MCP_BRIDGE_TIMER){clearInterval(w.__PT_MCP_BRIDGE_TIMER);}w.__PT_MCP_BRIDGE_ERRORS=0;w.__PT_MCP_BRIDGE_TIMER=setInterval(function(){var x=new XMLHttpRequest();x.open('GET','${bridgeUrl}/next',true);x.timeout=1500;x.onload=function(){if(x.status===200){w.__PT_MCP_BRIDGE_ERRORS=0;if(x.responseText){$se('runCode',x.responseText)}return;}w.__PT_MCP_BRIDGE_ERRORS=(w.__PT_MCP_BRIDGE_ERRORS||0)+1;if(w.__PT_MCP_BRIDGE_ERRORS>=6&&w.__PT_MCP_BRIDGE_TIMER){clearInterval(w.__PT_MCP_BRIDGE_TIMER);w.__PT_MCP_BRIDGE_TIMER=null;}};x.onerror=function(){w.__PT_MCP_BRIDGE_ERRORS=(w.__PT_MCP_BRIDGE_ERRORS||0)+1;if(w.__PT_MCP_BRIDGE_ERRORS>=6&&w.__PT_MCP_BRIDGE_TIMER){clearInterval(w.__PT_MCP_BRIDGE_TIMER);w.__PT_MCP_BRIDGE_TIMER=null;}};x.ontimeout=x.onerror;x.send()},350);})();");`;
 
 const install = [
   "Bridge :: Instalación segura",

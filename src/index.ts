@@ -51,7 +51,40 @@ server.setRequestHandler(GetPromptRequestSchema, async (request) => {
   return getPrompt(request.params.name, request.params.arguments);
 });
 
+function setupOwnerProcessWatch() {
+  const rawOwnerPid = process.env.PT_MCP_OWNER_PID;
+  if (!rawOwnerPid) {
+    return;
+  }
+
+  const ownerPid = Number(rawOwnerPid);
+  if (!Number.isInteger(ownerPid) || ownerPid <= 0) {
+    console.error(`PT_MCP_OWNER_PID invalido: ${rawOwnerPid}`);
+    return;
+  }
+
+  const timer = setInterval(() => {
+    try {
+      process.kill(ownerPid, 0);
+    }
+    catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (code === "EPERM") {
+        return;
+      }
+
+      console.error(`Owner process no detectado (pid=${ownerPid}). Cerrando MCP server.`);
+      process.exit(0);
+    }
+  }, 2000);
+
+  if (typeof (timer as NodeJS.Timeout).unref === "function") {
+    (timer as NodeJS.Timeout).unref();
+  }
+}
+
 async function main() {
+  setupOwnerProcessWatch();
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
