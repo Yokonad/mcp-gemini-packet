@@ -4,7 +4,7 @@
 
 **Servidor MCP para controlar Cisco Packet Tracer con Gemini CLI usando tools en lenguaje natural.**
 
-> ⚠️ **BETA:** Este proyecto está en fase beta. Puede cambiar sin previo aviso y algunas funciones pueden ser inestables según la versión de Cisco Packet Tracer.
+> **BETA:** Este proyecto está en fase beta. Puede cambiar sin previo aviso y algunas funciones pueden ser inestables según la versión de Cisco Packet Tracer.
 
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 [![Cisco](https://img.shields.io/badge/Cisco-Packet%20Tracer-1BA0D7?style=flat-square&logo=cisco&logoColor=white)](https://www.netacad.com/courses/packet-tracer)
@@ -23,7 +23,7 @@
 
 Para que el servidor MCP se comunique correctamente, asegúrate de tener todo esto listo antes de iniciar:
 
-1. **Sistema Operativo:** Windows.
+1. **Sistema Operativo:** Windows o Linux.
 2. **Node.js:** Versión 18 o superior instalada.
 3. **Cisco Packet Tracer:** Instalado y cerrado (el launcher lo abrirá por ti).
 4. **Extensión BridgeBuilder (Crucial):** Packet Tracer necesita tu script module persistente para permitir inyección de scripts. Si no lo tienes cargado aún, instálalo con:
@@ -31,6 +31,42 @@ Para que el servidor MCP se comunique correctamente, asegúrate de tener todo es
    .\scripts\install-bridgebuilder.ps1
    ```
 5. **Gemini CLI:** Debes tenerlo instalado globalmente (`npm install -g @google/gemini-cli`). Si es tu primera vez usándolo, asegúrate de haber ejecutado antes `gemini login` para autorizar tu cuenta.
+
+## Instaladores Automáticos (Windows y Linux)
+
+Ahora tienes una carpeta dedicada con instaladores de prerrequisitos:
+
+- Windows: [installer/install-prereqs.bat](installer/install-prereqs.bat)
+- Linux: [installer/install-prereqs.sh](installer/install-prereqs.sh)
+
+Estos instaladores te van guiando paso a paso y te preguntan si quieres instalar:
+
+- Node.js y npm
+- Gemini CLI
+- Copilot CLI
+
+Tambien verifican si ya lo tienes instalado y, si algo falla, intentan otros metodos.
+
+### Recomendaciones rapidas
+
+- En Windows, si un metodo falla por permisos, ejecuta el `.bat` como administrador.
+- En Linux, si al terminar no reconoce `gemini` o `copilot`, abre una terminal nueva o ejecuta `source ~/.bashrc`.
+- Si el instalador de Linux te pregunta por PATH, responde que si para evitar problemas despues.
+
+### Uso recomendado
+
+Windows:
+
+```bat
+installer\install-prereqs.bat
+```
+
+Linux:
+
+```bash
+chmod +x installer/install-prereqs.sh
+./installer/install-prereqs.sh
+```
 
 ![Instalacion](https://img.shields.io/badge/INSTALACION-FF007F?style=for-the-badge)
 
@@ -42,7 +78,7 @@ npm run build
 ![Inicio](https://img.shields.io/badge/INICIO_RAPIDO-FF007F?style=for-the-badge)
 
 ```powershell
-.\run-mcp-packet-tracer.cmd
+.\run.cmd
 ```
 
 El launcher:
@@ -86,6 +122,6 @@ Aunque el launcher abre todo automáticamente, el puente de comunicación requie
 
 ## Autoría y créditos
 
-- Certificado de autoría: [CERTIFICADO-DE-AUTORIA.md](CERTIFICADO-DE-AUTORIA.md)
-- Licencia de uso y créditos obligatorios: [LICENSE.md](LICENSE.md)
-- Aviso legal de distribución: [NOTICE.md](NOTICE.md)
+- Certificado de autoria: [CERTIFICADO-DE-AUTORIA.md](context_md/CERTIFICADO-DE-AUTORIA.md)
+- Licencia de uso y creditos obligatorios: [LICENSE.md](context_md/LICENSE.md)
+- Aviso legal de distribucion: [NOTICE.md](context_md/NOTICE.md)

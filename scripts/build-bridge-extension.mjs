@@ -32,7 +32,7 @@ const install = [
   "5) Verifica con pt_bridge_status => connected=true.",
   "",
   "Si editaste main.js y desaparecio BridgeBuilder:",
-  "- Configure PT Script Modules > selecciona BridgeBuilder > Remove > Add config\\extension\\BridgeBuilder.pts"
+  "- Configure PT Script Modules > selecciona BridgeBuilder > Remove > Add BridgeBuilder.pts"
 ].join("\n");
 
 const readme = [

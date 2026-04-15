@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "packet-tracer-helper": {
+      "command": "node",
+      "args": ["dist/index.js"]
+    }
+  }
+}

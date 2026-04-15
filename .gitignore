@@ -6,7 +6,7 @@ config/
 .vscode/
 
 # Ignore context and sensitive docs requested by user
-contexto-ia.md
+context_md/contexto-ia.md
 
 # Ignore local labs and logs
 *.pkt
@@ -15,4 +15,3 @@ contexto-ia.md
 # Ignore all markdown except primary readme
 *.md
 !README.md
-!readme.md

@@ -5,6 +5,9 @@ param(
   [switch]$SkipBuild,
   [switch]$NoOpenPacketTracer,
 
+  [ValidateSet('Ask', 'Gemini', 'Copilot')]
+  [string]$Assistant = 'Ask',
+
   [ValidateSet('Ask', 'Existing', 'New')]
   [string]$Mode = 'Ask'
 )
@@ -472,16 +475,54 @@ function Get-StartupOptions {
     [string]$SelectedMode,
     [bool]$SelectedSkipBuild,
     [bool]$SelectedNoOpenPacketTracer,
-    [string]$SelectedPktFile
+    [string]$SelectedPktFile,
+    [string]$SelectedAssistant
   )
 
-  if ($SelectedMode -ne 'Ask') {
-    return [PSCustomObject]@{
-      Mode = $SelectedMode
-      SkipBuild = $SelectedSkipBuild
-      NoOpenPacketTracer = $SelectedNoOpenPacketTracer
-      PktFile = $SelectedPktFile
+  $geminiCmd = $null
+  foreach ($name in @('gemini.cmd', 'gemini.exe', 'gemini.bat', 'gemini')) {
+    $found = Get-Command $name -ErrorAction SilentlyContinue
+    if ($null -ne $found) {
+      $geminiCmd = $found
+      break
     }
+  }
+
+  $copilotCmd = $null
+  foreach ($name in @('copilot.cmd', 'copilot.exe', 'copilot.bat', 'copilot', 'github-copilot-cli.cmd', 'github-copilot-cli.exe', 'github-copilot-cli.bat', 'github-copilot-cli')) {
+    $found = Get-Command $name -ErrorAction SilentlyContinue
+    if ($null -ne $found) {
+      $copilotCmd = $found
+      break
+    }
+  }
+
+  $effectiveAssistantName = 'Gemini'
+  $effectiveAssistantCommand = if ($null -ne $geminiCmd) { [string]$geminiCmd.Source } else { 'gemini' }
+
+  if ($SelectedAssistant -eq 'Gemini') {
+    if ($null -eq $geminiCmd) {
+      throw "Gemini CLI no esta instalado. Instalalo por favor con: npm install -g @google/gemini-cli"
+    }
+    $effectiveAssistantName = 'Gemini'
+    $effectiveAssistantCommand = [string]$geminiCmd.Source
+  }
+  elseif ($SelectedAssistant -eq 'Copilot') {
+    if ($null -eq $copilotCmd) {
+      throw "Copilot CLI no esta instalado. Instalalo por favor con: npm install -g @githubnext/github-copilot-cli"
+    }
+    $effectiveAssistantName = 'Copilot'
+    $effectiveAssistantCommand = [string]$copilotCmd.Source
+  }
+  elseif ($SelectedAssistant -ne 'Ask') {
+    throw "Valor de Assistant no valido: $SelectedAssistant"
+  }
+  elseif ($null -eq $geminiCmd -and $null -eq $copilotCmd) {
+    throw "No se encontro Gemini ni Copilot CLI. Instala uno por favor."
+  }
+  elseif ($null -eq $geminiCmd -and $null -ne $copilotCmd) {
+    $effectiveAssistantName = 'Copilot'
+    $effectiveAssistantCommand = [string]$copilotCmd.Source
   }
 
   Write-Host "" 
@@ -489,14 +530,54 @@ function Get-StartupOptions {
   Write-Host "   MCP PACKET TRACER // HACKER LAUNCHER" -ForegroundColor Magenta
   Write-Host "===============================================" -ForegroundColor DarkMagenta
 
+  if ($SelectedAssistant -eq 'Ask') {
+    Write-Host ""
+    Write-Host "Seleccion de CLI (paso 1):" -ForegroundColor Magenta
+    $geminiState = if ($null -ne $geminiCmd) { 'instalado' } else { 'no instalado' }
+    $copilotState = if ($null -ne $copilotCmd) { 'instalado' } else { 'no instalado' }
+    Write-Host "[1] Gemini  ($geminiState)" -ForegroundColor DarkMagenta
+    Write-Host "[2] Copilot ($copilotState)" -ForegroundColor DarkMagenta
+
+    $assistantChoice = Read-Host "Elige CLI (1/2, default 1)"
+    if ([string]::IsNullOrWhiteSpace($assistantChoice)) {
+      $assistantChoice = '1'
+    }
+
+    if ($assistantChoice -eq '2') {
+      if ($null -eq $copilotCmd) {
+        throw "Copilot CLI no esta instalado. Instalalo por favor con: npm install -g @githubnext/github-copilot-cli"
+      }
+      $effectiveAssistantName = 'Copilot'
+      $effectiveAssistantCommand = [string]$copilotCmd.Source
+    }
+    else {
+      if ($null -eq $geminiCmd) {
+        throw "Gemini CLI no esta instalado. Instalalo por favor con: npm install -g @google/gemini-cli"
+      }
+      $effectiveAssistantName = 'Gemini'
+      $effectiveAssistantCommand = [string]$geminiCmd.Source
+    }
+  }
+
+  if ($SelectedMode -ne 'Ask') {
+    return [PSCustomObject]@{
+      Mode = $SelectedMode
+      SkipBuild = $SelectedSkipBuild
+      NoOpenPacketTracer = $SelectedNoOpenPacketTracer
+      PktFile = $SelectedPktFile
+      AssistantName = $effectiveAssistantName
+      AssistantCommand = $effectiveAssistantCommand
+    }
+  }
+
   $downloadsDir = Join-Path $env:USERPROFILE 'Downloads'
   if (-not (Test-Path -LiteralPath $downloadsDir)) {
     $downloadsDir = $projectRoot
   }
 
-  Write-Host "[1] Abrir .pkt de Descargas + Gemini" -ForegroundColor Magenta
-  Write-Host "[2] Crear .pkt nuevo + Gemini" -ForegroundColor Magenta
-  Write-Host "[3] Solo Gemini CLI" -ForegroundColor Magenta
+  Write-Host "[1] Abrir .pkt de Descargas" -ForegroundColor Magenta
+  Write-Host "[2] Crear .pkt nuevo" -ForegroundColor Magenta
+  Write-Host "[3] Solo CLI (sin abrir Packet Tracer)" -ForegroundColor Magenta
 
   $choice = Read-Host "Elige opcion (1/2/3, default 1)"
   if ([string]::IsNullOrWhiteSpace($choice)) {
@@ -558,6 +639,8 @@ function Get-StartupOptions {
     SkipBuild = $effectiveSkipBuild
     NoOpenPacketTracer = $effectiveNoOpen
     PktFile = $effectivePktFile
+    AssistantName = $effectiveAssistantName
+    AssistantCommand = $effectiveAssistantCommand
   }
 }
 
@@ -674,20 +757,75 @@ function Ensure-McpServerRunning {
   Start-Sleep -Milliseconds 500
 }
 
+function Get-AssistantInvocationForCmd {
+  param([string]$AssistantCommand)
+
+  if ([string]::IsNullOrWhiteSpace($AssistantCommand)) {
+    throw "Comando de asistente vacio."
+  }
+
+  $cmdCommand = $AssistantCommand
+  if ($cmdCommand.EndsWith('.ps1', [System.StringComparison]::OrdinalIgnoreCase)) {
+    $cmdSibling = [System.IO.Path]::ChangeExtension($cmdCommand, '.cmd')
+    $batSibling = [System.IO.Path]::ChangeExtension($cmdCommand, '.bat')
+
+    if (Test-Path -LiteralPath $cmdSibling) {
+      $cmdCommand = $cmdSibling
+    }
+    elseif (Test-Path -LiteralPath $batSibling) {
+      $cmdCommand = $batSibling
+    }
+    else {
+      $escapedPs1 = $cmdCommand.Replace('"', '""')
+      return "powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File `"$escapedPs1`""
+    }
+  }
+
+  $escaped = $cmdCommand.Replace('"', '""')
+  return "`"$escaped`""
+}
+
+function Start-AssistantInCmd {
+  param(
+    [string]$AssistantName,
+    [string]$AssistantCommand
+  )
+
+  $invocation = Get-AssistantInvocationForCmd -AssistantCommand $AssistantCommand
+  $escapedProjectRoot = $projectRoot.Replace('"', '""')
+  $cmdLine = "title MCP Packet Tracer - $AssistantName && cd /d `"$escapedProjectRoot`""
+  $startupPrompt = "Usa el archivo context_md/prompt-rapido-pt.md como instrucciones base de velocidad para esta sesion y cumplalo estrictamente."
+  $escapedStartupPrompt = $startupPrompt.Replace('"', '""')
+
+  if ($AssistantName -eq 'Copilot') {
+    $copilotLaunch = "$invocation --add-dir `"$escapedProjectRoot`""
+    $mcpConfigPath = Join-Path $projectRoot 'config\copilot-mcp-config.json'
+    if (Test-Path -LiteralPath $mcpConfigPath) {
+      $escapedMcpConfigPath = $mcpConfigPath.Replace('"', '""')
+      $copilotLaunch = "$copilotLaunch --additional-mcp-config `"@$escapedMcpConfigPath`""
+    }
+
+    $cmdLine = $cmdLine + " && doskey copilot=$copilotLaunch `$* && doskey github-copilot-cli=$copilotLaunch `$*"
+    $cmdLine = $cmdLine + " && echo. && echo Iniciando Copilot CLI interactivo con MCP del proyecto... && echo. && $copilotLaunch -i `"$escapedStartupPrompt`""
+  }
+  else {
+    $cmdLine = $cmdLine + " && $invocation --prompt-interactive `"$escapedStartupPrompt`""
+  }
+
+  Start-Process -FilePath 'cmd.exe' -ArgumentList '/k', $cmdLine | Out-Null
+}
+
 try {
   if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
     throw "npm no esta disponible en PATH. Instala Node.js antes de continuar."
-  }
-
-  if (-not (Get-Command gemini -ErrorAction SilentlyContinue)) {
-    throw "gemini CLI no esta disponible en PATH. Instalalo con: npm install -g @google/gemini-cli"
   }
 
   $startupOptions = Get-StartupOptions `
     -SelectedMode $Mode `
     -SelectedSkipBuild ([bool]$SkipBuild) `
     -SelectedNoOpenPacketTracer ([bool]$NoOpenPacketTracer) `
-    -SelectedPktFile $PktFile
+    -SelectedPktFile $PktFile `
+    -SelectedAssistant $Assistant
 
   $effectivePktFile = $PktFile
   if ([string]::IsNullOrWhiteSpace($effectivePktFile) -and -not [string]::IsNullOrWhiteSpace($startupOptions.PktFile)) {
@@ -734,13 +872,14 @@ try {
     Write-Host "  (dejalo abierto para las topologias)" -ForegroundColor Magenta
     Write-Host "============================================" -ForegroundColor DarkMagenta
     Write-Host ""
-    Read-Host "Presiona ENTER cuando este abierto"
+    Write-Host "Continuando automaticamente sin pausa..." -ForegroundColor DarkMagenta
+    Start-Sleep -Milliseconds 700
   }
   else {
     Write-Host "[3/4] Apertura de Packet Tracer omitida (-NoOpenPacketTracer)." -ForegroundColor DarkMagenta
   }
 
-  Write-Host "[4/4] Iniciando Gemini CLI en el proyecto..." -ForegroundColor Magenta
+  Write-Host "[4/4] Iniciando $($startupOptions.AssistantName) CLI en CMD..." -ForegroundColor Magenta
   $bridgeStatus = Get-BridgeStatusQuick
   if ($null -ne $bridgeStatus) {
     Write-Host "Bridge status actual: $bridgeStatus" -ForegroundColor DarkMagenta
@@ -750,7 +889,7 @@ try {
   }
   Write-Host "Tip: pide crear topologias en lenguaje natural. Ejemplo: 'Crea 2 routers con una PC cada uno'" -ForegroundColor DarkMagenta
   Write-Host "Tip Bridge: primero invoca pt_bridge_autoconnect con {\"dryRun\": false} y luego pt_bridge_status." -ForegroundColor DarkMagenta
-  gemini
+  Start-AssistantInCmd -AssistantName $startupOptions.AssistantName -AssistantCommand $startupOptions.AssistantCommand
 }
 catch {
   Write-Host ""

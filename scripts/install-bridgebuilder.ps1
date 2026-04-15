@@ -1,15 +1,15 @@
 # install-bridgebuilder.ps1
-# Instala BridgeBuilder.pts desde config/extension
+# Instala BridgeBuilder.pts desde la raiz del proyecto
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 
-$bridgeBuilderPath = Join-Path (Join-Path (Join-Path (Join-Path $PSScriptRoot '..') 'config') 'extension') 'BridgeBuilder.pts'
+$bridgeBuilderPath = Join-Path (Join-Path $PSScriptRoot '..') 'BridgeBuilder.pts'
 
 if (-not (Test-Path -LiteralPath $bridgeBuilderPath)) {
-  Write-Error "No existe BridgeBuilder.pts en config/extension: $bridgeBuilderPath"
-  Write-Error "Exporta tu modulo BridgeBuilder y guárdalo en config/extension antes de continuar."
+  Write-Error "No existe BridgeBuilder.pts en la raiz del proyecto: $bridgeBuilderPath"
+  Write-Error "Exporta tu modulo BridgeBuilder y guardalo junto a run.ps1 antes de continuar."
   exit 1
 }
 

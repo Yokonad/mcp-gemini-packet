@@ -571,7 +571,7 @@ function exportBridgeExtension(outputDirOverride?: string, bridgeUrlOverride?: s
     "4) Desde Gemini ejecuta pt_bridge_status para verificar connected=true.",
     "5) Luego usa pt_full_build o pt_execute_js normalmente.",
     "",
-    "Si BridgeBuilder desaparece, reinstala config/extension/BridgeBuilder.pts desde Configure PT Script Modules."
+    "Si BridgeBuilder desaparece, reinstala BridgeBuilder.pts (raiz del proyecto) desde Configure PT Script Modules."
   ].join("\n");
 
   const bootstrapPath = resolve(outputDir, "bridge-bootstrap.js");
