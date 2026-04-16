@@ -2,7 +2,7 @@
 
 ![MCP PACKET TRACER](https://img.shields.io/badge/MCP_PACKET_TRACER-00F0FF?style=for-the-badge&labelColor=000000)
 
-**Servidor MCP para controlar Cisco Packet Tracer con Gemini CLI usando tools en lenguaje natural.**
+**Servidor MCP para controlar Cisco Packet Tracer con Gemini CLI y Copilot CLI usando tools en lenguaje natural.**
 
 > **BETA:** Este proyecto está en fase beta. Puede cambiar sin previo aviso y algunas funciones pueden ser inestables según la versión de Cisco Packet Tracer.
 
@@ -30,7 +30,9 @@ Para que el servidor MCP se comunique correctamente, asegúrate de tener todo es
    ```powershell
    .\scripts\install-bridgebuilder.ps1
    ```
-5. **Gemini CLI:** Debes tenerlo instalado globalmente (`npm install -g @google/gemini-cli`). Si es tu primera vez usándolo, asegúrate de haber ejecutado antes `gemini login` para autorizar tu cuenta.
+5. **CLI de IA (Gemini o Copilot):** Puedes usar cualquiera de los dos.
+  - Gemini CLI: `npm install -g @google/gemini-cli`
+  - Copilot CLI: `npm install -g @githubnext/github-copilot-cli`
 
 ## Instaladores Automáticos (Windows y Linux)
 
@@ -85,7 +87,7 @@ El launcher:
 1. Muestra `.pkt` de Descargas para elegir.
 2. Permite crear un `.pkt` nuevo.
 3. Arranca MCP server automaticamente.
-4. Abre Gemini CLI.
+4. Te deja elegir y abre Gemini CLI o Copilot CLI.
 
 ### Activación MANUAL del Bridge en Packet Tracer
 Aunque el launcher abre todo automáticamente, el puente de comunicación requiere que actives la interfaz de tu extensión:
